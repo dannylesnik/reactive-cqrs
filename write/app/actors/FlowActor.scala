@@ -5,14 +5,14 @@ import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.stream.{ActorMaterializer, OverflowStrategy}
 import kafka.KafkaConnector
 import model.Entities._
-import persistency.DBLayer
+import persistency.{EventRepository, MySQLComponent}
 import play.api.Logger
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
-class FlowActor extends Actor with ActorLogging with DBLayer with KafkaConnector{
+class FlowActor extends Actor with ActorLogging with EventRepository with KafkaConnector with MySQLComponent{
 
   implicit val sys: ActorSystem = context.system
   implicit val mat: ActorMaterializer = ActorMaterializer()

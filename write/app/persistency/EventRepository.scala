@@ -7,20 +7,9 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.Failure
 
-trait DBLayer {
+trait EventRepository extends EventTable{
 
-  val db = Database.forConfig("mysql")
-
-  val events = TableQuery[Events]
-
-class Events(tag: Tag) extends Table[Event](tag, "Events") {
-
-  def eventId = column[String]("EVENTID", O.PrimaryKey)
-  def docId = column[String]("DOCID")
-  def name = column[String]("NAME")
-  def text = column[String]("TEXT")
-  def * = (eventId,docId,name,text).mapTo[Event]
-}
+  self: DbComponent =>
 
 
   def deleteEvent(eventElement: EventElement):Future[EventElement]={
@@ -39,7 +28,7 @@ class Events(tag: Tag) extends Table[Event](tag, "Events") {
 
   def persistInSQL(evenElement:EventElement):Future[EventElement]={
     val event: Event = evenElement.element.get
-    println(s"Persisting id ${event.eventId}")
+    Logger.info(s"Persisting id ${event.eventId}")
 
     db.run(DBIO.seq(
       events += event
@@ -47,5 +36,29 @@ class Events(tag: Tag) extends Table[Event](tag, "Events") {
       Logger.error(s"Was not able to Persist the Event with id ${event.eventId}",ex)
       evenElement.copy(element = Failure(ex))}
   }
+}
+
+
+
+trait EventTable {
+  self: DbComponent =>
+
+  import profile.api._
+
+  class Events(tag: Tag) extends Table[Event](tag, "Events") {
+
+    def eventId = column[String]("EVENTID", O.PrimaryKey)
+
+    def docId = column[String]("DOCID")
+
+    def name = column[String]("NAME")
+
+    def text = column[String]("TEXT")
+
+    def * = (eventId, docId, name, text).mapTo[Event]
+  }
+
+
+   val events = TableQuery[Events]
 
 }

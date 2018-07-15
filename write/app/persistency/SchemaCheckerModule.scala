@@ -20,7 +20,7 @@ class SchemaCheckerModule extends AbstractModule{
 }
 
 @Singleton
-class SchemaChecker  @Inject()(system: ActorSystem) extends DBLayer {
+class SchemaChecker  @Inject()(system: ActorSystem) extends EventRepository with MySQLComponent {
 
   Logger.info("Updating Schema!!!")
 

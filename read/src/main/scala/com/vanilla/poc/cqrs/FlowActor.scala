@@ -71,7 +71,9 @@ class FlowActor extends Actor with ActorLogging with ElasticSearch {
 
 
   restartSource
-    .via(flow)
+    .via(flow).recoverWithRetries(3,{
+    case _:Throwable => restartSource
+  })
     .toMat(Sink.ignore)(Keep.both).run()
 
   override def receive: Receive = Actor.emptyBehavior
