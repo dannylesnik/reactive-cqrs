@@ -19,19 +19,13 @@ import scala.util.{Failure, Success, Try}
 
 class FlowActor extends Actor with ActorLogging with ElasticSearch {
 
-
-  val decider: Supervision.Decider = {
-    case _:Throwable =>  println("Restart!!!"); Supervision.Restart
-    case _           => Supervision.Restart
-  }
-
   val config: Config = context.system.settings.config.getConfig("akka.kafka.consumer")
 
   val flow: Flow[CommittableMessage[String, String], Done, NotUsed] =
     Flow[CommittableMessage[String,String]].
       map(msg => Event(msg.committableOffset,Success(Json.parse(msg.record.value()))))
-    .mapAsync(10) { event => indexEvent(event.json.get).map(f=> event.copy(json = f))}
-      .mapAsync(10)(f => {
+    .mapAsync(1) { event => indexEvent(event.json.get).map(f=> event.copy(json = f))}
+      .mapAsync(1)(f => {
     f.json match {
       case Success(_)=> f.committableOffset.commitScaladsl()
       case Failure(ex) => throw new StreamFailedException(ex.getMessage,ex)
@@ -66,13 +60,15 @@ class FlowActor extends Actor with ActorLogging with ElasticSearch {
   }
 
 
-  implicit val mat: ActorMaterializer = ActorMaterializer(ActorMaterializerSettings(context.system).withSupervisionStrategy(decider))
+  implicit val mat: ActorMaterializer = ActorMaterializer(ActorMaterializerSettings(context.system).withSupervisionStrategy { e =>
+    Supervision.Stop
+  })
 
 
 
   restartSource
-    .via(flow).recoverWithRetries(3,{
-    case _:Throwable => restartSource
+    .via(flow).recoverWithRetries(100,{
+    case _:Throwable => restartSource.via(flow)
   })
     .toMat(Sink.ignore)(Keep.both).run()
 
