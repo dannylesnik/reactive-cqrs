@@ -20,7 +20,6 @@ lazy val write = (project in file("write"))
     dependencies.akkaTestKit,
     dependencies.hsqldb,
     dependencies.jacksonCore,
-    dependencies.specs2,
     dependencies.jacksonDataBind,
     dependencies.jacksonModuleScala,
     dependencies.hikariPool
@@ -89,7 +88,8 @@ lazy val commonSettings = Seq(
 )
 
 lazy val commonDependencies = Seq(
-  dependencies.akkaStreams
+  dependencies.akkaStreams,
+  dependencies.specs2
 )
 
 
