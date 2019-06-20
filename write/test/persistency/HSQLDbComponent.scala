@@ -17,7 +17,7 @@ trait HSQLDbComponent extends DbComponent{
   val h2Url: String = randomDB + "MODE=MySql;DATABASE_TO_UPPER=false;DB_CLOSE_DELAY=-1;"
 
   override val db: profile.backend.Database = {
-    println("Creating test connection ..................................")
+    logger.info("Creating test connection ..................................")
     Database.forURL(url = h2Url, driver = "org.h2.Driver")
   }
 }
