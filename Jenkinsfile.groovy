@@ -1,9 +1,10 @@
 pipeline {
     agent any
     stages{
-        stage('Init'){
-            steps{
-                sh "mvn clean"
+        stage('Build'){
+            steps {
+                echo "Compiling..."
+                sh "${tool name: 'sbt', type:'org.jvnet.hudson.plugins.SbtPluginBuilder$SbtInstallation'}/bin/sbt compile"
             }
         }
     }
