@@ -7,11 +7,14 @@ version := "1.0"
 
 
 lazy val write = (project in file("write"))
-  .enablePlugins(PlayScala)
+  .enablePlugins(PlayScala, DockerPlugin)
   .settings(
   name := "write",
   settings,
-  libraryDependencies ++= commonDependencies ++ Seq(
+    daemonUser in Docker := "root",
+    daemonGroup := "root",
+    dockerBaseImage :=  "openjdk:11.0.3-jdk-slim-stretch",
+    libraryDependencies ++= commonDependencies ++ Seq(
     guice,
     dependencies.mysql,
     dependencies.spec2Junit,
@@ -22,15 +25,19 @@ lazy val write = (project in file("write"))
     dependencies.jacksonCore,
     dependencies.jacksonDataBind,
     dependencies.jacksonModuleScala,
-    dependencies.hikariPool
-  )
+    dependencies.hikariPool,
+
+)
 )
 
 
 
-lazy val read = project
+lazy val read = project.enablePlugins(DockerPlugin,JavaAppPackaging)
   .settings(
     name := "read",
+    daemonUser in Docker := "root",
+    daemonGroup := "root",
+    dockerBaseImage :=  "openjdk:11.0.3-jdk-slim-stretch",
     settings,
     libraryDependencies ++= commonDependencies ++ Seq(
       dependencies.playJason,
