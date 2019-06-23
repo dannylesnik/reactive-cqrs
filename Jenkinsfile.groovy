@@ -18,7 +18,8 @@ pipeline {
                     withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AWS Credentials User', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                         timeout(time: 4, unit: 'MINUTES') {
                             retry(3) {
-                                sh encoding: 'UTF-8', script: '${sbt} ecr:login'
+                                sh "${tool name: 'sbt', type: 'org.jvnet.hudson.plugins.SbtPluginBuilder$SbtInstallation'}/bin/sbt ecr:login"
+
                             }
                         }
                     }
