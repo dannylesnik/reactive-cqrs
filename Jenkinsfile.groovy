@@ -15,8 +15,6 @@ pipeline {
         }
         stage('Publish'){
             steps{
-                configFileProvider([
-                        configFile(fileId: 'docker-credentials', targetLocation: "${HOME}/.docker")]) {
                     withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'service.devjenkins', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                         timeout(time: 4, unit: 'MINUTES') {
                             retry(3) {
@@ -24,7 +22,7 @@ pipeline {
                             }
                         }
                     }
-                }
+
             }
         }
     }
