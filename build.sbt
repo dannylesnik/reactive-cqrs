@@ -5,6 +5,8 @@ name := "reactive-cqrs"
 organization := "com.vanilla.poc"
 version := "1.0"
 
+enablePlugins(EcrPlugin)
+
 
 lazy val write = (project in file("write"))
   .enablePlugins(PlayScala, DockerPlugin)
