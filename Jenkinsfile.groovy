@@ -15,7 +15,7 @@ pipeline {
         }
         stage('Publish'){
             steps{
-                    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'service.devjenkins', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
+                    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AWS Credentials User', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                         timeout(time: 4, unit: 'MINUTES') {
                             retry(3) {
                                 sh encoding: 'UTF-8', script: '${sbt} ecr:login'
