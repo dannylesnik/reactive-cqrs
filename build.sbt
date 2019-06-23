@@ -1,3 +1,5 @@
+import com.amazonaws.regions.{Region, Regions}
+
 
 scalaVersion := "2.12.6"
 
@@ -6,6 +8,15 @@ organization := "com.vanilla.poc"
 version := "1.0"
 
 enablePlugins(EcrPlugin)
+
+region in Ecr := Region.getRegion(Regions.US_EAST_1)
+repositoryName in Ecr := (packageName in Docker).value
+localDockerImage in Ecr := (packageName in Docker).value + ":" + (version in Docker).value
+
+packageName in Docker := ""
+
+//Authenticate and publish a local Docker image before pushing to ECR
+push in Ecr := ((push in Ecr) dependsOn(publishLocal in Docker, login in Ecr)).value
 
 
 lazy val write = (project in file("write"))
